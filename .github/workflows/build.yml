@@ -19,7 +19,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Build Windows App
-        run: ./gradlew packageMsi
+        run: .\gradlew.bat packageMsi
 
       - name: Upload Installer
         uses: actions/upload-artifact@v4
