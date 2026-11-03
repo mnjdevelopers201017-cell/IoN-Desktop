@@ -18,10 +18,11 @@ compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
+            // This line is the magic for all 3 OSs!
             targetFormats(
-                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg,
-                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi,
-                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb
+                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Msi, // Windows
+                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Dmg, // Mac
+                org.jetbrains.compose.desktop.application.dsl.TargetFormat.Deb  // Linux
             )
             packageName = "IoN-Desktop"
             packageVersion = "1.0.0"

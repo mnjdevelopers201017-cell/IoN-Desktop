@@ -1,4 +1,4 @@
-name: Build Desktop App
+name: Build Desktop App (All OS)
 
 on:
   push:
@@ -6,8 +6,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -18,11 +22,12 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build Windows App
-        run: .\gradlew.bat packageMsi
+      - name: Build for Current OS
+        # This command builds a .deb for Linux, .msi for Windows, and .dmg for Mac automatically
+        run: ./gradlew packageDistributionForCurrentOS
 
       - name: Upload Installer
         uses: actions/upload-artifact@v4
         with:
-          name: IoN-Windows-Installer
-          path: build/compose/binaries/main/msi/*.msi
+          name: IoN-Installer-${{ matrix.os }}
+          path: build/compose/binaries/main/
