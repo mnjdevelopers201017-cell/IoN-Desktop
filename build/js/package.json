@@ -1,0 +1,19 @@
+{
+  "name": "IoN-Desktop",
+  "version": "unspecified",
+  "private": true,
+  "workspaces": [
+    "packages/IoN-Desktop-web",
+    "packages/IoN-Desktop-web-test",
+    "packages_imported/skiko-wasm-js/0.7.97",
+    "packages_imported/skiko-js-wasm-runtime/0.7.97",
+    "packages_imported/Kotlin-DateTime-library-kotlinx-datetime-wasm-js/0.5.0",
+    "packages_imported/kotlin-test-js-runner/0.0.1"
+  ],
+  "resolutions": {},
+  "devDependencies": {},
+  "dependencies": {},
+  "peerDependencies": {},
+  "optionalDependencies": {},
+  "bundledDependencies": []
+}

@@ -1,0 +1,84 @@
+{
+  "version": "9",
+  "items": {
+    "b1c9e312d33fd857430b8057d2f9b14a": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.runtime/runtime-wasm-js/1.6.2/2e9f14fbc8eae8ae691333ec741ab0962cd796bd/runtime-wasm-js-1.6.2.klib"
+    },
+    "61108da20006a4cceb8e0b4753db9320": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-coroutines-core-wasm-js/1.8.0/6fa5af0c703e4957c811aef817336eb6f6572e72/kotlinx-coroutines-core-wasm-js-1.8.0.klib"
+    },
+    "1c6fc0b4d51e510c7517b56b13805943": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/atomicfu-wasm-js/0.23.2/f7046e9f5ce6014c3471098284bd654831bb1f41/atomicfu-wasm-js-0.23.2.klib"
+    },
+    "7ce94143ecc1114061b7ce887293d8e4": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-wasm-js/1.9.23/394404330a136320bc5aec771fd2c5906cd90056/kotlin-stdlib-wasm-js-1.9.23.klib"
+    },
+    "e4454401ac377a5a45fbd41ba9029c8d": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.collection-internal/collection-wasm-js/1.6.2/99ce48c5646a59da1124e10986869aecfdb1244f/collection-wasm-js-1.6.2.klib"
+    },
+    "2909428d01014a9d01697ef3ebc7cf20": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.annotation-internal/annotation-wasm-js/1.6.2/8780ce819e545e08b4703c3700497ac065d5b4a4/annotation-wasm-js-1.6.2.klib"
+    },
+    "67ac6af14b2389aa4fda9215e14f0af8": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.foundation/foundation-wasm-js/1.6.2/cd3c76ce71591623fa4fb9b98099abfca927e21c/foundation-wasm-js-1.6.2.klib"
+    },
+    "c1439660122ad5ea4ba2cae5c4cf3640": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.animation/animation-wasm-js/1.6.2/a8d51a7a639849f2cfcae7e53b6d6d4ed8ac0067/animation-wasm-js-1.6.2.klib"
+    },
+    "604a9e635f30f57b3dbb499fd93d961f": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.foundation/foundation-layout-wasm-js/1.6.2/deec7c0fe2619ec9e1bbd28729a81f5b8b6fe0d4/foundation-layout-wasm-js-1.6.2.klib"
+    },
+    "930e724beb7fb20ba9c9019139dadc4f": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.ui/ui-wasm-js/1.6.2/18e03d295e663f4634d54f587dd41619f8380cf2/ui-wasm-js-1.6.2.klib"
+    },
+    "b17aa6b1ff2a72cdbfb1892ea635edbc": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.ui/ui-text-wasm-js/1.6.2/cd62ca79529c7b95bfd8382ca8d1a8e131dfe7b/ui-text-wasm-js-1.6.2.klib"
+    },
+    "cb6117360967a32199715e1150792c4d": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.ui/ui-graphics-wasm-js/1.6.2/eb30ce6240802a9a6f46502353703db1089bfaad/ui-graphics-wasm-js-1.6.2.klib"
+    },
+    "35791bc040711d938b4c70d9bc68e7e4": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.ui/ui-unit-wasm-js/1.6.2/a3be9e478aab795bec9fb306b4f0cacba79b4347/ui-unit-wasm-js-1.6.2.klib"
+    },
+    "dc72df8d890c14c099d6b88e629935cc": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.ui/ui-geometry-wasm-js/1.6.2/37572c8ebfed3cc1d5346bfecbcccbc3c71036f3/ui-geometry-wasm-js-1.6.2.klib"
+    },
+    "5eb725cd6b9849d075a83889906827fa": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.ui/ui-util-wasm-js/1.6.2/8696530878fed1ffdedf2fe46e0bcd1f805df385/ui-util-wasm-js-1.6.2.klib"
+    },
+    "aef5447fdacddc86f35bcb824257750d": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.skiko/skiko-wasm-js/0.7.97/746301840de8b61e00350a84c71304433365aa1e/skiko-wasm-js-0.7.97.klib",
+      "target": "skiko-wasm-js/0.7.97"
+    },
+    "ca3f6583f8a89d202a8f79390aa1b6c6": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.skiko/skiko-js-wasm-runtime/0.7.97/12da2fe653306ca6f19fa6ee2395de09008d0ac0/skiko-js-wasm-runtime-0.7.97.jar",
+      "target": "skiko-js-wasm-runtime/0.7.97"
+    },
+    "6bfc386b7021cbd1e1e2a071f56ccb74": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.runtime/runtime-saveable-wasm-js/1.6.2/f1c902c48b9f5c46cfd0925f4f97cf1661d97d5d/runtime-saveable-wasm-js-1.6.2.klib"
+    },
+    "7741b0bcc6e61a317cba389aebc59400": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.animation/animation-core-wasm-js/1.6.2/1c3cb4753a80ab6c8ce50fa55eb988facd8134a8/animation-core-wasm-js-1.6.2.klib"
+    },
+    "2dc4083f5bcc6956d74c14b1b292561b": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.material3/material3-wasm-js/1.6.2/ed025f66794542ab97b721ba62aacdbe4d30f4c/material3-wasm-js-1.6.2.klib"
+    },
+    "abca0d3317873da851c94388b19efc63": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.material/material-ripple-wasm-js/1.6.2/1e879d788bae0bd78a5989e9e9b0cae73a230d8b/material-ripple-wasm-js-1.6.2.klib"
+    },
+    "754d3a947a533d63479e61f53627c081": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.compose.material/material-icons-core-wasm-js/1.6.2/254e7650ca1fc6c632a50364fbb4b2ef99363f85/material-icons-core-wasm-js-1.6.2.klib"
+    },
+    "7ecf9d88842e7ca74b2a67c72f3c5b60": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-datetime-wasm-js/0.5.0/629555641f7616da6dd028fae163a288a0e28264/kotlinx-datetime-wasm-js-0.5.0.klib",
+      "target": "Kotlin-DateTime-library-kotlinx-datetime-wasm-js/0.5.0"
+    },
+    "48316275c8d9cbfa355aa16f3de86bb6": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlinx/kotlinx-serialization-core-wasm-js/1.6.2/6f54ca1a4477e773a63266210cb8ca229e366ced/kotlinx-serialization-core-wasm-js-1.6.2.klib"
+    },
+    "a66860f155cb10a237acb5f7d0f6d0e3": {
+      "src": "/root/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-test-js-runner/1.9.22/e9b1fc55af69eb09d63b271d17c217d9483241cc/kotlin-test-js-runner-1.9.22.jar",
+      "target": "kotlin-test-js-runner/0.0.1"
+    }
+  }
+}

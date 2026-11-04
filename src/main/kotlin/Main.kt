@@ -19,13 +19,19 @@ import androidx.compose.ui.window.WindowPlacement
 import kotlinx.coroutines.launch
 
 fun main() = application {
+    var isSplashFinished by remember { mutableStateOf(false) }
+    
     Window(
         onCloseRequest = ::exitApplication,
-        title = "IoN Desktop Automation",
+        title = "IoN Desktop",
         state = rememberWindowState(placement = WindowPlacement.Maximized)
     ) {
-        MaterialTheme(colorScheme = darkColorScheme(background = Color(0xFF000000))) {
-            AutomationUI()
+        MaterialTheme(colorScheme = darkColorScheme(background = Color.Black)) {
+            if (!isSplashFinished) {
+                SplashScreen(onFinished = { isSplashFinished = true })
+            } else {
+                AutomationUI()
+            }
         }
     }
 }

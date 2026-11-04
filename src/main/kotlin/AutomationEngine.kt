@@ -19,15 +19,16 @@ object AutomationEngine {
     @Volatile var isRunning = false
     @Volatile private var stopRequested = false
 
-    // Ordered from fastest to slowest as requested
+    // Ordered by Highest Quota & Speed based on your dashboard
     private val modelFallbackChain = listOf(
-        "gemini-2.5-flash-lite",
-        "gemini-3.1-flash-lite",
         "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-2.5-flash-lite",
         "gemini-2.5-flash",
         "gemini-3-flash",
         "gemini-3.6-flash",
-        "gemini-3.8-flash"
+        "gemini-3.8-flash",
+        "gemini-1.5-flash" // Safety net
     )
     private var currentModelIndex = 0
 
@@ -98,7 +99,7 @@ object AutomationEngine {
             }
 
             step++
-            Thread.sleep(1000) 
+            Thread.sleep(1500) 
         }
         
         if (stopRequested) onLog("🛑 Automation stopped by user.")
@@ -127,7 +128,6 @@ object AutomationEngine {
             
             onLog("   ⚠️ Error on $model: $errorMsg")
             if (errorMsg?.contains("404") == true || errorMsg?.contains("400") == true) {
-                // If model doesn't exist, skip to next model immediately
                 onLog("   -> Skipping to next model...")
                 currentModelIndex = (currentModelIndex + 1) % modelFallbackChain.size
             }
