@@ -13,6 +13,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.WindowPlacement
@@ -20,24 +21,25 @@ import kotlinx.coroutines.launch
 
 fun main() = application {
     var isSplashFinished by remember { mutableStateOf(false) }
+    val windowState = rememberWindowState(placement = WindowPlacement.Maximized)
     
     Window(
         onCloseRequest = ::exitApplication,
         title = "IoN Desktop",
-        state = rememberWindowState(placement = WindowPlacement.Maximized)
+        state = windowState
     ) {
         MaterialTheme(colorScheme = darkColorScheme(background = Color(0xFF000000))) {
             if (!isSplashFinished) {
                 SplashScreen(onFinished = { isSplashFinished = true })
             } else {
-                AutomationUI()
+                AutomationUI(windowState)
             }
         }
     }
 }
 
 @Composable
-fun AutomationUI() {
+fun AutomationUI(windowState: WindowState) {
     var apiKey by remember { mutableStateOf("") }
     var task by remember { mutableStateOf("") }
     var logText by remember { mutableStateOf("Ready to automate...") }
@@ -85,6 +87,10 @@ fun AutomationUI() {
                         }
                         isRunning = true
                         logText = "Starting..."
+                        
+                        // MINIMIZE THE WINDOW SO THE AI CAN SEE THE DESKTOP!
+                        windowState.isMinimized = true 
+                        
                         scope.launch {
                             AutomationEngine.runTask(task, apiKey) { msg ->
                                 logText += "\n$msg"
