@@ -21,11 +21,16 @@ object AutomationEngine {
     @Volatile var isRunning = false
     @Volatile private var stopRequested = false
 
-    // Stable models ordered by speed and quota
+    // EXACT Models from Google AI Studio, ordered by speed/quota
     private val modelFallbackChain = listOf(
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
         "gemini-2.5-flash-lite",
         "gemini-2.5-flash",
-        "gemini-1.5-flash"
+        "gemini-3-flash-preview",
+        "gemini-3.6-flash",
+        "gemini-3.8-flash",
+        "gemini-1.5-flash" // Ultimate safety net
     )
     private var currentModelIndex = 0
 
@@ -80,7 +85,7 @@ object AutomationEngine {
                         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                             Desktop.getDesktop().browse(URI(url))
                             onLog("   Opened browser: $url")
-                            Thread.sleep(3000) // Wait for browser to load
+                            Thread.sleep(4000) // Wait for page to load
                         }
                     }
                     "tap" -> {
