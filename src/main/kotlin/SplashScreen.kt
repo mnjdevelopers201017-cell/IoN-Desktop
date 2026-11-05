@@ -18,7 +18,6 @@ fun SplashScreen(onFinished: () -> Unit) {
     val screenWidth = 2000f
     val easing = LinearOutSlowInEasing
 
-    // Using Animatable for absolute control over X11 rendering
     val topBarX = remember { Animatable(-screenWidth) }
     val topStemX = remember { Animatable(screenWidth) }
     val centerX = remember { Animatable(-screenWidth) }
@@ -29,30 +28,27 @@ fun SplashScreen(onFinished: () -> Unit) {
     val textAlpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        // CRITICAL FIX: Wait 300ms for X11 to actually render the window
-        delay(300) 
+        // CRITICAL: Wait for the window to actually render on the screen before animating
+        delay(500) 
 
-        // Launch all block animations at the same time with staggered delays
         launch { topBarX.animateTo(0f, tween(400, 0, easing = easing)) }
         launch { topStemX.animateTo(0f, tween(400, 100, easing = easing)) }
         launch { centerX.animateTo(0f, tween(400, 200, easing = easing)) }
         launch { bottomStemX.animateTo(0f, tween(400, 300, easing = easing)) }
         launch { bottomBarX.animateTo(0f, tween(400, 400, easing = easing)) }
 
-        // Wait for blocks to slide in, then drop the text
         delay(650)
         launch { textY.animateTo(0f, tween(350, easing = easing)) }
         launch { textAlpha.animateTo(1f, tween(350)) }
 
-        // Wait for everything to finish, then go to main app
-        delay(1000)
+        delay(1500)
         onFinished()
     }
 
     Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             
-            // EXACT LOGO GEOMETRY
+            // Exact Logo Geometry (Flush edges, matching the image)
             Box(Modifier.offset(x = topBarX.value.dp).width(240.dp).height(50.dp).background(Color.White))
             Box(Modifier.offset(x = topStemX.value.dp).width(80.dp).height(70.dp).background(Color.White))
             Box(

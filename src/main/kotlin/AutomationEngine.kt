@@ -2,6 +2,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.awt.Desktop
 import java.awt.Rectangle
 import java.awt.Robot
 import java.awt.Toolkit
@@ -9,6 +10,7 @@ import java.awt.event.InputEvent
 import java.awt.event.KeyEvent
 import java.io.ByteArrayOutputStream
 import java.net.HttpURLConnection
+import java.net.URI
 import java.net.URL
 import java.util.Base64
 import javax.imageio.ImageIO
@@ -19,16 +21,11 @@ object AutomationEngine {
     @Volatile var isRunning = false
     @Volatile private var stopRequested = false
 
-    // Ordered by Highest Quota & Speed based on your dashboard
+    // Stable models ordered by speed and quota
     private val modelFallbackChain = listOf(
-        "gemini-3.5-flash-lite",
-        "gemini-3.1-flash-lite",
         "gemini-2.5-flash-lite",
         "gemini-2.5-flash",
-        "gemini-3-flash",
-        "gemini-3.6-flash",
-        "gemini-3.8-flash",
-        "gemini-1.5-flash" // Safety net
+        "gemini-1.5-flash"
     )
     private var currentModelIndex = 0
 
@@ -78,6 +75,14 @@ object AutomationEngine {
 
             try {
                 when (action) {
+                    "open_url" -> {
+                        val url = jsonResponse.getString("url")
+                        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                            Desktop.getDesktop().browse(URI(url))
+                            onLog("   Opened browser: $url")
+                            Thread.sleep(3000) // Wait for browser to load
+                        }
+                    }
                     "tap" -> {
                         val x = (jsonResponse.getInt("x") / 1000.0 * screenSize.width).toInt()
                         val y = (jsonResponse.getInt("y") / 1000.0 * screenSize.height).toInt()
@@ -123,6 +128,13 @@ object AutomationEngine {
                 Thread.sleep(1000)
                 continue
             }
+
+            if (result != null && result.optString("_error") == "503") {
+                onLog("   ⚠️ Model overloaded (503). Waiting...")
+                Thread.sleep(3000L * (attempts + 1)) // Exponential backoff
+                attempts++
+                continue
+            }
             
             if (result != null) return result
             
@@ -143,7 +155,14 @@ object AutomationEngine {
             You are a Desktop Automation Agent controlling a ${Toolkit.getDefaultToolkit().screenSize.width}x${Toolkit.getDefaultToolkit().screenSize.height} screen.
             TASK: $task
             Look at the current screen and decide the NEXT action.
+            
+            If the task requires a website, use "open_url" first.
+            If you need to click a button, use "tap".
+            If you need to type, use "type".
+            If you need to wait for a page to load, use "wait".
+            
             Reply ONLY in raw JSON. Choose one:
+            Open URL: {"action":"open_url","url":"https://...","reason":"..."}
             Tap: {"action":"tap","x":<0-1000>,"y":<0-1000>,"reason":"..."}
             Type: {"action":"type","text":"<text>","reason":"..."}
             Wait: {"action":"wait","duration":<ms>,"reason":"..."}
@@ -173,6 +192,7 @@ object AutomationEngine {
 
             val code = conn.responseCode
             if (code == 429) return Pair(JSONObject().put("_error", "quota"), null)
+            if (code == 503) return Pair(JSONObject().put("_error", "503"), null)
             if (code != 200) {
                 val errorBody = conn.errorStream?.bufferedReader()?.readText() ?: ""
                 return Pair(null, "HTTP $code: ${errorBody.take(100)}")

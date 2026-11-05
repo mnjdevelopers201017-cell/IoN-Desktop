@@ -26,7 +26,7 @@ fun main() = application {
         title = "IoN Desktop",
         state = rememberWindowState(placement = WindowPlacement.Maximized)
     ) {
-        MaterialTheme(colorScheme = darkColorScheme(background = Color.Black)) {
+        MaterialTheme(colorScheme = darkColorScheme(background = Color(0xFF000000))) {
             if (!isSplashFinished) {
                 SplashScreen(onFinished = { isSplashFinished = true })
             } else {
