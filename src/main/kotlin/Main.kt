@@ -19,8 +19,11 @@ import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.WindowPlacement
 import kotlinx.coroutines.launch
 
+// Put SPLASH back in the flow!
+enum class Screen { SPLASH, LOGIN, AUTOMATION }
+
 fun main() = application {
-    var isSplashFinished by remember { mutableStateOf(false) }
+    var currentScreen by remember { mutableStateOf(Screen.SPLASH) }
     val windowState = rememberWindowState(placement = WindowPlacement.Maximized)
     
     Window(
@@ -29,10 +32,10 @@ fun main() = application {
         state = windowState
     ) {
         MaterialTheme(colorScheme = darkColorScheme(background = Color(0xFF000000))) {
-            if (!isSplashFinished) {
-                SplashScreen(onFinished = { isSplashFinished = true })
-            } else {
-                AutomationUI(windowState)
+            when (currentScreen) {
+                Screen.SPLASH -> SplashScreen(onFinished = { currentScreen = Screen.LOGIN })
+                Screen.LOGIN -> LoginScreen(onLoginSuccess = { currentScreen = Screen.AUTOMATION })
+                Screen.AUTOMATION -> AutomationUI(windowState)
             }
         }
     }
@@ -88,7 +91,6 @@ fun AutomationUI(windowState: WindowState) {
                         isRunning = true
                         logText = "Starting..."
                         
-                        // MINIMIZE THE WINDOW SO THE AI CAN SEE THE DESKTOP!
                         windowState.isMinimized = true 
                         
                         scope.launch {

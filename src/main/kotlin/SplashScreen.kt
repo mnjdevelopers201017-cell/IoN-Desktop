@@ -17,7 +17,6 @@ import kotlinx.coroutines.delay
 fun SplashScreen(onFinished: () -> Unit) {
     var startAnim by remember { mutableStateOf(false) }
     
-    // Using IntOffset to prevent DP scaling issues on different screens
     val offsetTopBar by animateIntAsState(if (startAnim) 0 else -2000, tween(600, 0))
     val offsetTopStem by animateIntAsState(if (startAnim) 0 else 2000, tween(600, 100))
     val offsetCenter by animateIntAsState(if (startAnim) 0 else -2000, tween(600, 200))
@@ -28,11 +27,9 @@ fun SplashScreen(onFinished: () -> Unit) {
     val textAlpha by animateFloatAsState(if (startAnim) 1f else 0f, tween(500, 800))
 
     LaunchedEffect(Unit) {
-        // WAIT 1.5 SECONDS: Gives the PC time to actually draw the window on the screen
-        delay(1500) 
+        delay(1000) // Wait for X11 to draw the window
         startAnim = true
-        // Wait for animations to finish (600ms + 500ms = ~1500ms)
-        delay(1500)
+        delay(1500) // Wait for animation to finish
         onFinished()
     }
 
