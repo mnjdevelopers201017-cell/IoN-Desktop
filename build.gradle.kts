@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.22"
     id("org.jetbrains.compose") version "1.6.2"
+    kotlin("plugin.serialization") version "1.9.22"
 }
 
 repositories {
@@ -14,6 +15,15 @@ dependencies {
     implementation(compose.material3)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.8.0")
     implementation("org.json:json:20240303")
+    
+    // ADDED THIS FOR THE EYE ICON
+    implementation("org.jetbrains.compose.material:material-icons-extended:1.6.2")
+    
+    // Supabase 2.6.0
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:2.6.0")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:2.6.0")
+    implementation("io.ktor:ktor-client-cio:2.3.10")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 }
 
 compose.desktop {
