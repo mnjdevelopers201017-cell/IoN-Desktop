@@ -22,38 +22,45 @@ fun DashboardScreen() {
     var cashBalance by remember { mutableStateOf(0L) }
     var cryptoBalance by remember { mutableStateOf(0L) }
     var jobs by remember { mutableStateOf<List<Job>>(emptyList()) }
-    var statusText by remember { mutableStateOf("Loading...") }
+    var statusText by remember { mutableStateOf("Connecting to Supabase...") }
+    var isError by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         scope.launch {
-            // Check if the user actually has a valid session
             val session = Supabase.client.auth.currentSessionOrNull()
             if (session == null) {
-                statusText = "⚠️ Not logged in! Please check your email to confirm your account, then log in."
+                statusText = "⚠️ Not logged in!"
+                isError = true
                 return@launch
             }
 
             try {
-                // Fetch Wallet
+                // 1. Fetch Wallet
                 val wallet = Supabase.client.postgrest["wallets"].select().decodeSingleOrNull<Wallet>()
                 if (wallet != null) {
                     cashBalance = wallet.cashBalance
                     cryptoBalance = wallet.cryptoBalance
+                    statusText = "Connected as ${session.user?.email}"
+                } else {
+                    statusText = "Connected, but no wallet found for this user. (Did the trigger run?)"
                 }
 
-                // Fetch Jobs
-                jobs = Supabase.client.postgrest["jobs"].select().decodeList<Job>()
-                statusText = "Connected securely as ${session.user?.email}"
+                // 2. Fetch Jobs
+                val fetchedJobs = Supabase.client.postgrest["jobs"].select().decodeList<Job>()
+                jobs = fetchedJobs
+                
             } catch (e: Exception) {
                 statusText = "Error: ${e.message}"
+                isError = true
+                println("Dashboard Error: ${e.message}") // Print to terminal for debugging
             }
         }
     }
 
     Column(modifier = Modifier.fillMaxSize().background(Color.Black).padding(24.dp)) {
         Text("IoN Dashboard", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
-        Text(statusText, color = if (statusText.contains("⚠️") || statusText.contains("Error")) Color.Red else Color.Green, fontSize = 14.sp)
+        Text(statusText, color = if (isError) Color.Red else Color.Green, fontSize = 14.sp)
         
         Spacer(Modifier.height(24.dp))
         
@@ -76,36 +83,37 @@ fun DashboardScreen() {
         Text("Available Jobs", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.height(16.dp))
 
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            items(jobs) { job ->
-                Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), modifier = Modifier.fillMaxWidth()) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(job.title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                        Text(job.description, color = Color.Gray, fontSize = 14.sp)
-                        Spacer(Modifier.height(8.dp))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Reward: ${job.reward} ${job.coinType}", color = Color(0xFF4285F4), fontWeight = FontWeight.Bold)
-                            Button(onClick = {
-                                scope.launch {
-                                    if (Supabase.client.auth.currentSessionOrNull() == null) {
-                                        statusText = "⚠️ Session expired. Please log in again."
-                                        return@launch
+        if (jobs.isEmpty()) {
+            Text("No jobs found on the server.", color = Color.Gray, fontSize = 16.sp)
+        } else {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(jobs) { job ->
+                    Card(colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A)), modifier = Modifier.fillMaxWidth()) {
+                        Column(Modifier.padding(16.dp)) {
+                            Text(job.title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                            Text(job.description, color = Color.Gray, fontSize = 14.sp)
+                            Spacer(Modifier.height(8.dp))
+                            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                                Text("Reward: ${job.reward} ${job.coinType}", color = Color(0xFF4285F4), fontWeight = FontWeight.Bold)
+                                Button(onClick = {
+                                    scope.launch {
+                                        try {
+                                            Supabase.client.postgrest.rpc(
+                                                "complete_job",
+                                                buildJsonObject {
+                                                    put("job_id", job.id)
+                                                    put("coin_type", job.coinType)
+                                                    put("reward_amount", job.reward.toIntOrNull() ?: 0)
+                                                }
+                                            )
+                                            statusText = "✅ Job completed securely!"
+                                        } catch (e: Exception) {
+                                            statusText = "RPC Error: ${e.message}"
+                                            isError = true
+                                        }
                                     }
-                                    try {
-                                        Supabase.client.postgrest.rpc(
-                                            "complete_job",
-                                            buildJsonObject {
-                                                put("job_id", job.id)
-                                                put("coin_type", job.coinType)
-                                                put("reward_amount", job.reward.toIntOrNull() ?: 0)
-                                            }
-                                        )
-                                        statusText = "✅ Job completed securely!"
-                                    } catch (e: Exception) {
-                                        statusText = "RPC Error: ${e.message}"
-                                    }
-                                }
-                            }) { Text("Complete Job") }
+                                }) { Text("Complete Job") }
+                            }
                         }
                     }
                 }
