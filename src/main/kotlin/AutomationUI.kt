@@ -21,7 +21,34 @@ fun AutomationUI(windowState: WindowState) {
     var task by remember { mutableStateOf("") }
     var logText by remember { mutableStateOf("Ready to automate...") }
     var isRunning by remember { mutableStateOf(false) }
+    var showGuide by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    // Permissions Guide Dialog
+    if (showGuide) {
+        AlertDialog(
+            onDismissRequest = { showGuide = false },
+            title = { Text("How to enable Automation Permissions") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("On Windows (Important):", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    Text("Windows blocks automation by default. Right-click the IoN app icon and select 'Run as Administrator'.", fontSize = 14.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text("On Linux (X11/Wayland):", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    Text("Ensure the app has access to /dev/uinput. Run: sudo usermod -aG input \$USER and restart the session.", fontSize = 14.sp)
+                    Spacer(Modifier.height(8.dp))
+                    Text("On macOS:", fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                    Text("Go to System Settings -> Privacy & Security -> Accessibility and add the IoN app.", fontSize = 14.sp)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showGuide = false }) { Text("Got it") }
+            },
+            containerColor = Color(0xFF1A1A1A),
+            titleContentColor = Color.White,
+            textContentColor = Color.LightGray
+        )
+    }
 
     Row(modifier = Modifier.fillMaxSize().background(Color(0xFF000000))) {
         Column(
@@ -30,6 +57,28 @@ fun AutomationUI(windowState: WindowState) {
         ) {
             Text("IoN Automation Engine", color = Color.White, fontSize = 24.sp)
             
+            // NEW: Permissions & Setup Help Button
+            OutlinedButton(
+                onClick = { showGuide = true },
+                modifier = Modifier.fillMaxWidth().height(40.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Yellow),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("⚠️ Setup & Permissions Guide", fontSize = 12.sp)
+            }
+
+            Button(
+                onClick = {
+                    val result = AutomationEngine.testMouseControl()
+                    logText += "\n[TEST] $result"
+                },
+                modifier = Modifier.fillMaxWidth().height(40.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF333333)),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Test Mouse Permissions", color = Color.White, fontSize = 12.sp)
+            }
+
             OutlinedTextField(
                 value = apiKey,
                 onValueChange = { apiKey = it },
@@ -46,7 +95,7 @@ fun AutomationUI(windowState: WindowState) {
                 value = task,
                 onValueChange = { task = it },
                 label = { Text("What should the AI do?") },
-                modifier = Modifier.fillMaxWidth().height(150.dp),
+                modifier = Modifier.fillMaxWidth().height(120.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White, unfocusedTextColor = Color.White,
                     focusedBorderColor = Color(0xFF4285F4)
@@ -59,13 +108,11 @@ fun AutomationUI(windowState: WindowState) {
                         AutomationEngine.stopTask()
                     } else {
                         if (apiKey.isBlank() || task.isBlank()) {
-                            logText = "⚠️ Please enter API Key and Task."
+                            logText += "\n⚠️ Please enter API Key and Task."
                             return@Button
                         }
                         isRunning = true
-                        logText = "Starting..."
-                        
-                        windowState.isMinimized = true 
+                        logText += "\n▶ Starting task: $task"
                         
                         scope.launch {
                             AutomationEngine.runTask(task, apiKey) { msg ->
@@ -97,7 +144,7 @@ fun AutomationUI(windowState: WindowState) {
                     text = logText,
                     color = Color(0xFF00FF00),
                     fontFamily = FontFamily.Monospace,
-                    fontSize = 14.sp,
+                    fontSize = 12.sp,
                     modifier = Modifier.verticalScroll(rememberScrollState())
                 )
             }

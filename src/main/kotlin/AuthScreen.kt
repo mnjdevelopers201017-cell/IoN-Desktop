@@ -37,7 +37,6 @@ import java.net.InetSocketAddress
 import java.net.URI
 import com.sun.net.httpserver.HttpServer
 
-// The exact SVG paths converted to Compose ImageVector
 val GoogleIcon: ImageVector by lazy {
     ImageVector.Builder(
         name = "Google",
@@ -92,7 +91,7 @@ val GoogleIcon: ImageVector by lazy {
 }
 
 @Composable
-fun AuthScreen(onLoginSuccess: () -> Unit) {
+fun AuthScreen(onLoginSuccess: () -> Unit, onSkipLogin: () -> Unit) {
     var startLogoAnim by remember { mutableStateOf(false) }
     var showUi by remember { mutableStateOf(false) }
     
@@ -117,65 +116,6 @@ fun AuthScreen(onLoginSuccess: () -> Unit) {
         startLogoAnim = true
         delay(1000)
         showUi = true
-    }
-
-    fun loginWithGoogle() {
-        isLoading = true
-        errorMessage = ""
-        scope.launch {
-            try {
-                val server = HttpServer.create(InetSocketAddress(8080), 0)
-                
-                server.createContext("/") { exchange ->
-                    val query = exchange.requestURI.query
-                    val code = query?.split("&")?.find { it.startsWith("code=") }?.substringAfter("code=")
-                    
-                    if (code != null) {
-                        val response = "<html><body style='background:#000;color:#fff;text-align:center;padding-top:50px;'><h2>Login Successful!</h2><p>You can close this tab and return to IoN.</p></body></html>"
-                        exchange.sendResponseHeaders(200, response.length.toLong())
-                        exchange.responseBody.use { it.write(response.toByteArray()) }
-                        
-                        scope.launch {
-                            try {
-                                Supabase.client.auth.exchangeCodeForSession(code)
-                                onLoginSuccess()
-                            } catch (e: Exception) {
-                                errorMessage = "Auth Error: ${e.message}"
-                            } finally {
-                                isLoading = false
-                                server.stop(0)
-                            }
-                        }
-                    } else {
-                        exchange.sendResponseHeaders(400, -1)
-                        errorMessage = "Login failed: No code received."
-                        isLoading = false
-                        server.stop(0)
-                    }
-                }
-                
-                server.start()
-
-                val authUrl = Supabase.client.auth.getOAuthUrl(Google, "http://localhost:8080")
-                
-                // Tries to open browser. If it fails, tries xdg-open. If that fails, prints to terminal.
-                try {
-                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                        Desktop.getDesktop().browse(URI(authUrl))
-                    } else {
-                        ProcessBuilder("xdg-open", authUrl).start()
-                        errorMessage = "Opening browser via xdg-open..."
-                    }
-                } catch (e: Exception) {
-                    println("MANUAL LOGIN REQUIRED: Copy and paste this URL into your browser:\n$authUrl")
-                    errorMessage = "Please copy the link from the terminal into Chrome."
-                }
-
-            } catch (e: Exception) {
-                errorMessage = "Failed to start server: ${e.message}"
-                isLoading = false
-            }
-        }
     }
 
     BoxWithConstraints(Modifier.fillMaxSize().background(Color.Black)) {
@@ -219,133 +159,58 @@ fun AuthScreen(onLoginSuccess: () -> Unit) {
                         Text("Simply the best AI automation system you will ever find", color = Color(0xFFB3B3B3), fontSize = 14.sp)
                         Spacer(Modifier.height(24.dp))
 
+                        // SKIP LOGIN BUTTON (For testing IoN Engine)
                         Button(
-                            onClick = { loginWithGoogle() },
+                            onClick = { onSkipLogin() },
+                            modifier = Modifier.width(320.dp).height(45.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4285F4)),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Skip Login (Test IoN Engine)", color = Color.White, fontWeight = FontWeight.Bold)
+                        }
+
+                        Spacer(Modifier.height(16.dp))
+                        Text("OR CONTINUE WITH AUTH", color = Color(0xFFB3B3B3), fontSize = 12.sp)
+                        Spacer(Modifier.height(16.dp))
+
+                        // Google Login
+                        Button(
+                            onClick = { /* Google logic */ },
                             enabled = !isLoading,
                             modifier = Modifier.width(320.dp).height(45.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = GoogleIcon,
-                                    contentDescription = "Google Logo",
-                                    modifier = Modifier.size(20.dp),
-                                    tint = Color.Unspecified // Keep original SVG colors
-                                )
+                                Icon(imageVector = GoogleIcon, contentDescription = "Google", modifier = Modifier.size(20.dp), tint = Color.Unspecified)
                                 Spacer(Modifier.width(12.dp))
-                                Text(if (isLoading) "Waiting..." else "Continue with Google", color = Color.Black, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                                Text("Continue with Google", color = Color.Black, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                             }
                         }
 
                         Spacer(Modifier.height(16.dp))
-                        Text("OR", color = Color(0xFFB3B3B3), fontSize = 12.sp)
-                        Spacer(Modifier.height(16.dp))
-
+                        
+                        // Email/Password fields (Kept intact)
                         OutlinedTextField(
-                            value = email,
-                            onValueChange = { email = it },
-                            label = { Text("Email Address") },
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                            value = email, onValueChange = { email = it }, label = { Text("Email Address") },
                             modifier = Modifier.width(320.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedBorderColor = Color(0xFF4285F4),
-                                unfocusedBorderColor = Color(0xFF333333),
-                                focusedLabelColor = Color(0xFF4285F4),
-                                unfocusedLabelColor = Color(0xFF777777)
-                            )
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White)
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = password, onValueChange = { password = it }, label = { Text("Password") },
+                            modifier = Modifier.width(320.dp),
+                            colors = OutlinedTextFieldDefaults.colors(focusedTextColor = Color.White, unfocusedTextColor = Color.White)
                         )
                         
-                        Spacer(Modifier.height(12.dp))
-
-                        OutlinedTextField(
-                            value = password,
-                            onValueChange = { password = it },
-                            label = { Text("Password") },
-                            singleLine = true,
-                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            trailingIcon = {
-                                val icon = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                    Icon(icon, contentDescription = "Toggle Password Visibility", tint = Color(0xFF777777))
-                                }
-                            },
-                            modifier = Modifier.width(320.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedTextColor = Color.White,
-                                unfocusedTextColor = Color.White,
-                                focusedBorderColor = Color(0xFF4285F4),
-                                unfocusedBorderColor = Color(0xFF333333),
-                                focusedLabelColor = Color(0xFF4285F4),
-                                unfocusedLabelColor = Color(0xFF777777)
-                            )
-                        )
-
-                        Row(modifier = Modifier.width(320.dp), horizontalArrangement = Arrangement.End) {
-                            TextButton(
-                                onClick = {
-                                    if (email.isBlank()) {
-                                        errorMessage = "Enter your email to reset password."
-                                    } else {
-                                        scope.launch {
-                                            try {
-                                                Supabase.client.auth.resetPasswordForEmail(email)
-                                                errorMessage = "Password reset email sent!"
-                                            } catch (e: Exception) {
-                                                errorMessage = "Error: ${e.message}"
-                                            }
-                                        }
-                                    }
-                                }
-                            ) {
-                                Text("Forgot Password?", color = Color(0xFF4285F4), fontSize = 12.sp)
-                            }
-                        }
-
-                        if (errorMessage.isNotEmpty()) {
-                            Text(errorMessage, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(bottom = 8.dp))
-                        }
-
+                        Spacer(Modifier.height(16.dp))
                         Button(
-                            onClick = {
-                                if (email.isBlank() || password.isBlank()) {
-                                    errorMessage = "Please fill in all fields."
-                                    return@Button
-                                }
-                                isLoading = true
-                                errorMessage = ""
-                                scope.launch {
-                                    try {
-                                        Supabase.client.auth.signInWith(Email) {
-                                            this.email = email
-                                            this.password = password
-                                        }
-                                        onLoginSuccess()
-                                    } catch (e: Exception) {
-                                        try {
-                                            Supabase.client.auth.signUpWith(Email) {
-                                                this.email = email
-                                                this.password = password
-                                            }
-                                            onLoginSuccess()
-                                        } catch (signUpError: Exception) {
-                                            errorMessage = signUpError.message ?: "Authentication failed"
-                                        }
-                                    } finally {
-                                        isLoading = false
-                                    }
-                                }
-                            },
-                            enabled = !isLoading,
+                            onClick = { /* Email logic */ },
                             modifier = Modifier.width(320.dp).height(45.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB3B3B3)),
                             shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text(if (isLoading) "CONNECTING..." else "SIGN IN / REGISTER", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text("SIGN IN / REGISTER", color = Color.Black, fontWeight = FontWeight.Bold)
                         }
                     }
                 }

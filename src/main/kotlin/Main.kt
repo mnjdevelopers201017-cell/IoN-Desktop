@@ -21,7 +21,10 @@ fun main() = application {
         MaterialTheme(colorScheme = darkColorScheme(background = Color(0xFF000000))) {
             when (currentScreen) {
                 Screen.SPLASH -> SplashScreen(onFinished = { currentScreen = Screen.AUTH })
-                Screen.AUTH -> AuthScreen(onLoginSuccess = { currentScreen = Screen.DASHBOARD })
+                Screen.AUTH -> AuthScreen(
+                    onLoginSuccess = { currentScreen = Screen.DASHBOARD },
+                    onSkipLogin = { currentScreen = Screen.AUTOMATION }
+                )
                 Screen.DASHBOARD -> DashboardScreen()
                 Screen.AUTOMATION -> AutomationUI(windowState)
             }
